@@ -1,24 +1,29 @@
 def ask_question(question_data):
     """Задаёт вопрос и проверяет ответ"""
-    user_answer = input(question_data["text"])
+    user_input = input(question_data["text"]).strip()
     
     # Обработка ответа в зависимости от типа
     if question_data["type"] == "number":
-        user_answer = int(user_answer)
+        try:
+            # Пытаемся превратить ввод в число
+            user_answer = int(user_input)
+        except ValueError:
+            # Если ввели буквы вместо цифр — ответ заведомо неверный
+            user_answer = None
     else:
-        user_answer = user_answer.lower().strip()
+        # Для текста: убираем пробелы и переводим в нижний регистр
+        user_answer = user_input.lower()
     
-    # Проверка (поддерживает несколько вариантов ответа)
+    # Проверка ответа в списке допустимых
     correct_answers = question_data["answers"]
     if user_answer in correct_answers:
-        print("Правильно!")
+        print(" Правильно!")
         return 1
     else:
-        print(f"Неправильно! Правильный ответ: {correct_answers[0]}")
+        # Показываем первый правильный вариант из списка в случае ошибки
+        print(f" Неправильно! Правильный ответ: {correct_answers[0]}")
         return 0
-
-
-# Все вопросы в одной структуре
+# База данных вопросов
 questions = [
     {
         "text": "Столица Франции? ",
@@ -56,12 +61,12 @@ questions = [
         "type": "number"
     },
     {
-        "text": "Какая страна самая маленькая? (Ватикан, Монако, Науру...) ",
+        "text": "Какая страна самая маленькая? ",
         "answers": ["ватикан"],
         "type": "text"
     },
     {
-        "text": "Сколько будет 10*900000? (число) ",
+        "text": "Сколько будет 10 * 900 000? (число) ",
         "answers": [9000000],
         "type": "number"
     },
@@ -71,13 +76,24 @@ questions = [
         "type": "text"
     }
 ]
-
-# Основная игра
-score = 0
-for question in questions:
-    score += ask_question(question)
-
-# Результат
-print(f"\nВаш счёт: {score} из {len(questions)}")
-print("Спасибо за игру!")
-
+def main():
+    print("="*30)
+    print("Quizz: Check your knowledge")
+    print("="*30)
+    score = 0
+    for question in questions:
+        score += ask_question(question)
+    # Итоговый результат 
+    print("\n" + "="*30)
+    print(f"Ваш счёт: {score} из {len(questions)}")
+    
+    if score == len(questions):
+        print("Идеально! Вы настоящий эрудит. ")
+    elif score > len(questions) // 2:
+        print("Хороший результат! ")
+    else:
+        print("Можно лучше. Попробуйте еще раз! ")
+    
+    print("="*30)
+if __name__ == "__main__":
+    main()
